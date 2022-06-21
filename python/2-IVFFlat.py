@@ -17,7 +17,7 @@ xq[:, 0] += np.arange(nq) / 1000.
 import faiss
 
 nlist = 100
-k = 4
+k = 1
 quantizer = faiss.IndexFlatL2(d)  # the other index
 index = faiss.IndexIVFFlat(quantizer, d, nlist, faiss.METRIC_L2)
 # here we specify METRIC_L2, by default it performs inner-product search
@@ -29,9 +29,13 @@ assert index.is_trained
 index.add(xb)                  # add may be a bit slower as well
 D, I = index.search(xb, k)     # actual search
 print(I[-5:])                  # neighbors of the 5 last queries
+print(D[-5:])
+
+
 index.nprobe = 10              # default nprobe is 1, try a few more
 D, I = index.search(xq, k)
 print(I[-5:])                  # neighbors of the 5 last queries
+print(D[-5:])
 
 index_save_path = 'IndexIVFFlat.dat'
 faiss.write_index(index, index_save_path)
@@ -42,3 +46,5 @@ print(I[-5:])                  # neighbors of the 5 last queries
 index.nprobe = 10              # default nprobe is 1, try a few more
 D, I = index.search(xq, k)
 print(I[-5:])
+print(type(D))
+print(type(I))

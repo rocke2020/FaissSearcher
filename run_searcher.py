@@ -1,6 +1,6 @@
-from bert_encoder import BertEncoder
+from searcher.bert_encoder import BertEncoder
 import pandas as pd
-from faiss_searcher import FaissSearcher
+from searcher.faiss_searcher import FaissSearcher
 
 
 encoder = BertEncoder(config_path, checkpoint_path, dict_path)  # 预训练权重自己得准备好，也可以是自己写的encoder，必须有encode方法，建议直接继承base_encoder类来写

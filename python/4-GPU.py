@@ -20,18 +20,18 @@ res = faiss.StandardGpuResources()  # use a single GPU
 
 ## Using a flat index
 
-index_flat = faiss.IndexFlatL2(d)  # build a flat (CPU) index
+# index_flat = faiss.IndexFlatL2(d)  # build a flat (CPU) index
 
-# make it a flat GPU index
-gpu_index_flat = faiss.index_cpu_to_gpu(res, 0, index_flat)
+# # make it a flat GPU index
+# gpu_index_flat = faiss.index_cpu_to_gpu(res, 0, index_flat)
 
-gpu_index_flat.add(xb)         # add vectors to the index
-print(gpu_index_flat.ntotal)
+# gpu_index_flat.add(xb)         # add vectors to the index
+# print(gpu_index_flat.ntotal)
 
-k = 4                          # we want to see 4 nearest neighbors
-D, I = gpu_index_flat.search(xq, k)  # actual search
-print(I[:5])                   # neighbors of the 5 first queries
-print(I[-5:])                  # neighbors of the 5 last queries
+# k = 4                          # we want to see 4 nearest neighbors
+# D, I = gpu_index_flat.search(xq, k)  # actual search
+# print(I[:5])                   # neighbors of the 5 first queries
+# print(I[-5:])                  # neighbors of the 5 last queries
 
 
 ## Using an IVF index
@@ -49,9 +49,28 @@ gpu_index_ivf.train(xb)        # add vectors to the index
 assert gpu_index_ivf.is_trained
 
 gpu_index_ivf.add(xb)          # add vectors to the index
-print(gpu_index_ivf.ntotal)
+print(f'gpu_index_ivf.ntotal {gpu_index_ivf.ntotal}')
 
 k = 4                          # we want to see 4 nearest neighbors
 D, I = gpu_index_ivf.search(xq, k)  # actual search
 print(I[:5])                   # neighbors of the 5 first queries
 print(I[-5:])                  # neighbors of the 5 last queries
+
+
+k = 4                          # we want to see 4 nearest neighbors
+D, I = gpu_index_ivf.search(xb[:1000], k)  # actual search
+print(I[:5])                   # neighbors of the 5 first queries
+print(I[-5:]) 
+
+index_save_path = 'IndexIVFFlat-gpu.dat'
+cpu_index = faiss.index_gpu_to_cpu(gpu_index_ivf)
+print('index_gpu_to_cpu')
+faiss.write_index(cpu_index, index_save_path)
+print('ok to write')
+
+index_ivf = faiss.read_index(index_save_path)
+gpu_index_ivf = faiss.index_cpu_to_gpu(res, 0, index_ivf)
+k = 4                          # we want to see 4 nearest neighbors
+D, I = gpu_index_ivf.search(xb[:1000], k)  # actual search
+print(I[:5])                   # neighbors of the 5 first queries
+print(I[-5:]) 
